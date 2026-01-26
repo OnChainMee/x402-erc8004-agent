@@ -1,0 +1,37 @@
+export declare const DEFAULT_SERVER_URL = "https://metamask-sdk.api.cx.metamask.io/";
+export declare const DEFAULT_SOCKET_TRANSPORTS: string[];
+export declare const MIN_IN_MS: number;
+export declare const HOUR_IN_MS: number;
+export declare const DAY_IN_MS: number;
+export declare const DEFAULT_SESSION_TIMEOUT_MS: number;
+export declare const CHANNEL_MAX_WAITING_TIME: number;
+export declare const MAX_RECONNECTION_ATTEMPS = 3;
+export declare const MAX_RPC_WAIT_TIME: number;
+export declare const PROTOCOL_VERSION = 2;
+export declare const RPC_METHODS: {
+    METAMASK_GETPROVIDERSTATE: string;
+    METAMASK_CONNECTSIGN: string;
+    METAMASK_CONNECTWITH: string;
+    METAMASK_OPEN: string;
+    METAMASK_BATCH: string;
+    PERSONAL_SIGN: string;
+    WALLET_REQUESTPERMISSIONS: string;
+    WALLET_REVOKEPERMISSIONS: string;
+    WALLET_GETPERMISSIONS: string;
+    WALLET_WATCHASSET: string;
+    WALLET_SWITCHETHEREUMCHAIN: string;
+    WALLET_ADDETHEREUMCHAIN: string;
+    ETH_REQUESTACCOUNTS: string;
+    ETH_ACCOUNTS: string;
+    ETH_CHAINID: string;
+    ETH_SENDTRANSACTION: string;
+    ETH_SIGNTYPEDDATA: string;
+    ETH_SIGNTYPEDDATA_V3: string;
+    ETH_SIGNTYPEDDATA_V4: string;
+    ETH_SIGNTRANSACTION: string;
+    ETH_SIGN: string;
+    PERSONAL_EC_RECOVER: string;
+};
+export declare const RPC_METHODS_TO_TRACK_IN_ANALYTICS: string[];
+export declare function isAnalyticsTrackedRpcMethod(method: string): boolean;
+//# sourceMappingURL=config.d.ts.map

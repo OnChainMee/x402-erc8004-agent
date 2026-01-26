@@ -1,0 +1,2 @@
+export { arbitrum, arbitrumSepolia, base, baseSepolia, berachain, berachainBepolia, bsc, celo, gnosis, hoodi, katana, mainnet, optimism, optimismSepolia, polygon, sepolia, } from 'viem/chains';
+//# sourceMappingURL=chains.d.ts.map

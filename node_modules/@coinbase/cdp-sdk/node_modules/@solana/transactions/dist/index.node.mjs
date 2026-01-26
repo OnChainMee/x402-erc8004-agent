@@ -1,0 +1,234 @@
+import { getAddressDecoder, getAddressFromPublicKey } from '@solana/addresses';
+import { transformDecoder, fixDecoderSize, combineCodec, padRightDecoder, transformEncoder, fixEncoderSize } from '@solana/codecs-core';
+import { getStructEncoder, getBytesEncoder, getStructDecoder, getArrayDecoder, getBytesDecoder, getTupleDecoder, getArrayEncoder } from '@solana/codecs-data-structures';
+import { getShortU16Decoder, getU8Decoder, getShortU16Encoder } from '@solana/codecs-numbers';
+import { SolanaError, SOLANA_ERROR__TRANSACTION__MESSAGE_SIGNATURES_MISMATCH, SOLANA_ERROR__TRANSACTION__FEE_PAYER_SIGNATURE_MISSING, SOLANA_ERROR__TRANSACTION__ADDRESSES_CANNOT_SIGN_TRANSACTION, SOLANA_ERROR__TRANSACTION__SIGNATURES_MISSING, SOLANA_ERROR__TRANSACTION__EXCEEDS_SIZE_LIMIT, SOLANA_ERROR__TRANSACTION__CANNOT_ENCODE_WITH_EMPTY_SIGNATURES } from '@solana/errors';
+import { getTransactionVersionDecoder, compileTransactionMessage, getCompiledTransactionMessageEncoder, isTransactionMessageWithBlockhashLifetime, isTransactionMessageWithDurableNonceLifetime } from '@solana/transaction-messages';
+import { getBase58Decoder, getBase64Decoder } from '@solana/codecs-strings';
+import { signBytes } from '@solana/keys';
+
+// src/codecs/transaction-codec.ts
+function getSignaturesToEncode(signaturesMap) {
+  const signatures = Object.values(signaturesMap);
+  if (signatures.length === 0) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__CANNOT_ENCODE_WITH_EMPTY_SIGNATURES);
+  }
+  return signatures.map((signature) => {
+    if (!signature) {
+      return new Uint8Array(64).fill(0);
+    }
+    return signature;
+  });
+}
+function getSignaturesEncoder() {
+  return transformEncoder(
+    getArrayEncoder(fixEncoderSize(getBytesEncoder(), 64), { size: getShortU16Encoder() }),
+    getSignaturesToEncode
+  );
+}
+
+// src/codecs/transaction-codec.ts
+function getTransactionEncoder() {
+  return getStructEncoder([
+    ["signatures", getSignaturesEncoder()],
+    ["messageBytes", getBytesEncoder()]
+  ]);
+}
+function getTransactionDecoder() {
+  return transformDecoder(
+    getStructDecoder([
+      ["signatures", getArrayDecoder(fixDecoderSize(getBytesDecoder(), 64), { size: getShortU16Decoder() })],
+      ["messageBytes", getBytesDecoder()]
+    ]),
+    decodePartiallyDecodedTransaction
+  );
+}
+function getTransactionCodec() {
+  return combineCodec(getTransactionEncoder(), getTransactionDecoder());
+}
+function decodePartiallyDecodedTransaction(transaction) {
+  const { messageBytes, signatures } = transaction;
+  const signerAddressesDecoder = getTupleDecoder([
+    // read transaction version
+    getTransactionVersionDecoder(),
+    // read first byte of header, `numSignerAccounts`
+    // padRight to skip the next 2 bytes, `numReadOnlySignedAccounts` and `numReadOnlyUnsignedAccounts` which we don't need
+    padRightDecoder(getU8Decoder(), 2),
+    // read static addresses
+    getArrayDecoder(getAddressDecoder(), { size: getShortU16Decoder() })
+  ]);
+  const [_txVersion, numRequiredSignatures, staticAddresses] = signerAddressesDecoder.decode(messageBytes);
+  const signerAddresses = staticAddresses.slice(0, numRequiredSignatures);
+  if (signerAddresses.length !== signatures.length) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__MESSAGE_SIGNATURES_MISMATCH, {
+      numRequiredSignatures,
+      signaturesLength: signatures.length,
+      signerAddresses
+    });
+  }
+  const signaturesMap = {};
+  signerAddresses.forEach((address, index) => {
+    const signatureForAddress = signatures[index];
+    if (signatureForAddress.every((b) => b === 0)) {
+      signaturesMap[address] = null;
+    } else {
+      signaturesMap[address] = signatureForAddress;
+    }
+  });
+  return {
+    messageBytes,
+    signatures: Object.freeze(signaturesMap)
+  };
+}
+function compileTransaction(transactionMessage) {
+  const compiledMessage = compileTransactionMessage(transactionMessage);
+  const messageBytes = getCompiledTransactionMessageEncoder().encode(compiledMessage);
+  const transactionSigners = compiledMessage.staticAccounts.slice(0, compiledMessage.header.numSignerAccounts);
+  const signatures = {};
+  for (const signerAddress of transactionSigners) {
+    signatures[signerAddress] = null;
+  }
+  let lifetimeConstraint;
+  if (isTransactionMessageWithBlockhashLifetime(transactionMessage)) {
+    lifetimeConstraint = {
+      blockhash: transactionMessage.lifetimeConstraint.blockhash,
+      lastValidBlockHeight: transactionMessage.lifetimeConstraint.lastValidBlockHeight
+    };
+  } else if (isTransactionMessageWithDurableNonceLifetime(transactionMessage)) {
+    lifetimeConstraint = {
+      nonce: transactionMessage.lifetimeConstraint.nonce,
+      nonceAccountAddress: transactionMessage.instructions[0].accounts[0].address
+    };
+  }
+  return Object.freeze({
+    ...lifetimeConstraint ? { lifetimeConstraint } : void 0,
+    messageBytes,
+    signatures: Object.freeze(signatures)
+  });
+}
+var base58Decoder;
+function getSignatureFromTransaction(transaction) {
+  if (!base58Decoder) base58Decoder = getBase58Decoder();
+  const signatureBytes = Object.values(transaction.signatures)[0];
+  if (!signatureBytes) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__FEE_PAYER_SIGNATURE_MISSING);
+  }
+  const transactionSignature = base58Decoder.decode(signatureBytes);
+  return transactionSignature;
+}
+function uint8ArraysEqual(arr1, arr2) {
+  return arr1.length === arr2.length && arr1.every((value, index) => value === arr2[index]);
+}
+async function partiallySignTransaction(keyPairs, transaction) {
+  let newSignatures;
+  let unexpectedSigners;
+  await Promise.all(
+    keyPairs.map(async (keyPair) => {
+      const address = await getAddressFromPublicKey(keyPair.publicKey);
+      const existingSignature = transaction.signatures[address];
+      if (existingSignature === void 0) {
+        unexpectedSigners ||= /* @__PURE__ */ new Set();
+        unexpectedSigners.add(address);
+        return;
+      }
+      if (unexpectedSigners) {
+        return;
+      }
+      const newSignature = await signBytes(keyPair.privateKey, transaction.messageBytes);
+      if (existingSignature !== null && uint8ArraysEqual(newSignature, existingSignature)) {
+        return;
+      }
+      newSignatures ||= {};
+      newSignatures[address] = newSignature;
+    })
+  );
+  if (unexpectedSigners && unexpectedSigners.size > 0) {
+    const expectedSigners = Object.keys(transaction.signatures);
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__ADDRESSES_CANNOT_SIGN_TRANSACTION, {
+      expectedAddresses: expectedSigners,
+      unexpectedAddresses: [...unexpectedSigners]
+    });
+  }
+  if (!newSignatures) {
+    return transaction;
+  }
+  return Object.freeze({
+    ...transaction,
+    signatures: Object.freeze({
+      ...transaction.signatures,
+      ...newSignatures
+    })
+  });
+}
+async function signTransaction(keyPairs, transaction) {
+  const out = await partiallySignTransaction(keyPairs, transaction);
+  assertIsFullySignedTransaction(out);
+  Object.freeze(out);
+  return out;
+}
+function isFullySignedTransaction(transaction) {
+  return Object.entries(transaction.signatures).every(([_, signatureBytes]) => !!signatureBytes);
+}
+function assertIsFullySignedTransaction(transaction) {
+  const missingSigs = [];
+  Object.entries(transaction.signatures).forEach(([address, signatureBytes]) => {
+    if (!signatureBytes) {
+      missingSigs.push(address);
+    }
+  });
+  if (missingSigs.length > 0) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__SIGNATURES_MISSING, {
+      addresses: missingSigs
+    });
+  }
+}
+function getBase64EncodedWireTransaction(transaction) {
+  const wireTransactionBytes = getTransactionEncoder().encode(transaction);
+  return getBase64Decoder().decode(wireTransactionBytes);
+}
+var TRANSACTION_PACKET_SIZE = 1280;
+var TRANSACTION_PACKET_HEADER = 40 + 8;
+var TRANSACTION_SIZE_LIMIT = TRANSACTION_PACKET_SIZE - TRANSACTION_PACKET_HEADER;
+function getTransactionSize(transaction) {
+  return getTransactionEncoder().getSizeFromValue(transaction);
+}
+function isTransactionWithinSizeLimit(transaction) {
+  return getTransactionSize(transaction) <= TRANSACTION_SIZE_LIMIT;
+}
+function assertIsTransactionWithinSizeLimit(transaction) {
+  const transactionSize = getTransactionSize(transaction);
+  if (transactionSize > TRANSACTION_SIZE_LIMIT) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__EXCEEDS_SIZE_LIMIT, {
+      transactionSize,
+      transactionSizeLimit: TRANSACTION_SIZE_LIMIT
+    });
+  }
+}
+
+// src/sendable-transaction.ts
+function isSendableTransaction(transaction) {
+  return isFullySignedTransaction(transaction) && isTransactionWithinSizeLimit(transaction);
+}
+function assertIsSendableTransaction(transaction) {
+  assertIsFullySignedTransaction(transaction);
+  assertIsTransactionWithinSizeLimit(transaction);
+}
+function getTransactionMessageSize(transactionMessage) {
+  return getTransactionSize(compileTransaction(transactionMessage));
+}
+function isTransactionMessageWithinSizeLimit(transactionMessage) {
+  return getTransactionMessageSize(transactionMessage) <= TRANSACTION_SIZE_LIMIT;
+}
+function assertIsTransactionMessageWithinSizeLimit(transactionMessage) {
+  const transactionSize = getTransactionMessageSize(transactionMessage);
+  if (transactionSize > TRANSACTION_SIZE_LIMIT) {
+    throw new SolanaError(SOLANA_ERROR__TRANSACTION__EXCEEDS_SIZE_LIMIT, {
+      transactionSize,
+      transactionSizeLimit: TRANSACTION_SIZE_LIMIT
+    });
+  }
+}
+
+export { TRANSACTION_PACKET_HEADER, TRANSACTION_PACKET_SIZE, TRANSACTION_SIZE_LIMIT, assertIsFullySignedTransaction, assertIsSendableTransaction, assertIsTransactionMessageWithinSizeLimit, assertIsTransactionWithinSizeLimit, compileTransaction, getBase64EncodedWireTransaction, getSignatureFromTransaction, getTransactionCodec, getTransactionDecoder, getTransactionEncoder, getTransactionMessageSize, getTransactionSize, isFullySignedTransaction, isSendableTransaction, isTransactionMessageWithinSizeLimit, isTransactionWithinSizeLimit, partiallySignTransaction, signTransaction };
+//# sourceMappingURL=index.node.mjs.map
+//# sourceMappingURL=index.node.mjs.map

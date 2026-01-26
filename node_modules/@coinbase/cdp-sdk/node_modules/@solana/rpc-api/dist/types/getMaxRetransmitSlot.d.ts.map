@@ -1,0 +1,1 @@
+{"version":3,"file":"getMaxRetransmitSlot.d.ts","sourceRoot":"","sources":["../../src/getMaxRetransmitSlot.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,IAAI,EAAE,MAAM,mBAAmB,CAAC;AAE9C,KAAK,+BAA+B,GAAG,IAAI,CAAC;AAE5C,MAAM,MAAM,uBAAuB,GAAG;IAClC;;;;OAIG;IACH,oBAAoB,IAAI,+BAA+B,CAAC;CAC3D,CAAC"}

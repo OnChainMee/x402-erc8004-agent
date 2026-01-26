@@ -1,0 +1,130 @@
+import { Codec, Decoder, Encoder, FixedSizeCodec, FixedSizeDecoder, FixedSizeEncoder } from '@solana/codecs-core';
+import { NumberCodec, NumberDecoder, NumberEncoder } from '@solana/codecs-numbers';
+import { Brand } from '@solana/nominal-types';
+/**
+ * Represents an integer value denominated in Lamports (ie. $1 \times 10^{-9}$ ◎).
+ *
+ * It is represented as a `bigint` in client code and an `u64` in server code.
+ */
+export type Lamports = Brand<bigint, 'Lamports'>;
+/**
+ * This is a type guard that accepts a `bigint` as input. It will both return `true` if the integer
+ * conforms to the {@link Lamports} type and will refine the type for use in your program.
+ *
+ * @example
+ * ```ts
+ * import { isLamports } from '@solana/rpc-types';
+ *
+ * if (isLamports(lamports)) {
+ *     // At this point, `lamports` has been refined to a
+ *     // `Lamports` that can be used anywhere Lamports are expected.
+ *     await transfer(fromAddress, toAddress, lamports);
+ * } else {
+ *     setError(`${lamports} is not a quantity of Lamports`);
+ * }
+ * ```
+ */
+export declare function isLamports(putativeLamports: bigint): putativeLamports is Lamports;
+/**
+ * Lamport values returned from the RPC API conform to the type {@link Lamports}. You can use a
+ * value of that type wherever a quantity of Lamports is expected.
+ *
+ * @example
+ * From time to time you might acquire a number that you expect to be a quantity of Lamports, from
+ * an untrusted network API or user input. To assert that such an arbitrary number is usable as a
+ * quantity of Lamports, use this function.
+ *
+ * ```ts
+ * import { assertIsLamports } from '@solana/rpc-types';
+ *
+ * // Imagine a function that creates a transfer instruction when a user submits a form.
+ * function handleSubmit() {
+ *     // We know only that what the user typed conforms to the `number` type.
+ *     const lamports: number = parseInt(quantityInput.value, 10);
+ *     try {
+ *         // If this type assertion function doesn't throw, then
+ *         // Typescript will upcast `lamports` to `Lamports`.
+ *         assertIsLamports(lamports);
+ *         // At this point, `lamports` is a `Lamports` that can be used anywhere Lamports are expected.
+ *         await transfer(fromAddress, toAddress, lamports);
+ *     } catch (e) {
+ *         // `lamports` turned out not to validate as a quantity of Lamports.
+ *     }
+ * }
+ * ```
+ */
+export declare function assertIsLamports(putativeLamports: bigint): asserts putativeLamports is Lamports;
+/**
+ * This helper combines _asserting_ that a number is a possible number of {@link Lamports} with
+ * _coercing_ it to the {@link Lamports} type. It's best used with untrusted input.
+ *
+ * @example
+ * ```ts
+ * import { lamports } from '@solana/rpc-types';
+ *
+ * await transfer(address(fromAddress), address(toAddress), lamports(100000n));
+ * ```
+ */
+export declare function lamports(putativeLamports: bigint): Lamports;
+type ExtractAdditionalProps<T, U> = Omit<T, keyof U>;
+/**
+ * Returns an encoder that you can use to encode a 64-bit {@link Lamports} value to 8 bytes in
+ * little endian order.
+ */
+export declare function getDefaultLamportsEncoder(): FixedSizeEncoder<Lamports, 8>;
+/**
+ * Returns an encoder that you can use to encode a {@link Lamports} value to a byte array.
+ *
+ * You must supply a number decoder that will determine how encode the numeric value.
+ *
+ * @example
+ * ```ts
+ * import { getLamportsEncoder } from '@solana/rpc-types';
+ * import { getU16Encoder } from '@solana/codecs-numbers';
+ *
+ * const lamports = lamports(256n);
+ * const lamportsEncoder = getLamportsEncoder(getU16Encoder());
+ * const lamportsBytes = lamportsEncoder.encode(lamports);
+ * // Uint8Array(2) [ 0, 1 ]
+ * ```
+ */
+export declare function getLamportsEncoder<TEncoder extends NumberEncoder>(innerEncoder: TEncoder): Encoder<Lamports> & ExtractAdditionalProps<TEncoder, NumberEncoder>;
+/**
+ * Returns a decoder that you can use to decode a byte array representing a 64-bit little endian
+ * number to a {@link Lamports} value.
+ */
+export declare function getDefaultLamportsDecoder(): FixedSizeDecoder<Lamports, 8>;
+/**
+ * Returns a decoder that you can use to convert an array of bytes representing a number to a
+ * {@link Lamports} value.
+ *
+ * You must supply a number decoder that will determine how many bits to use to decode the numeric
+ * value.
+ *
+ * @example
+ * ```ts
+ * import { getLamportsDecoder } from '@solana/rpc-types';
+ * import { getU16Decoder } from '@solana/codecs-numbers';
+ *
+ * const lamportsBytes = new Uint8Array([ 0, 1 ]);
+ * const lamportsDecoder = getLamportsDecoder(getU16Decoder());
+ * const lamports = lamportsDecoder.decode(lamportsBytes); // lamports(256n)
+ * ```
+ */
+export declare function getLamportsDecoder<TDecoder extends NumberDecoder>(innerDecoder: TDecoder): Decoder<Lamports> & ExtractAdditionalProps<TDecoder, NumberDecoder>;
+/**
+ * Returns a codec that you can use to encode from or decode to a 64-bit {@link Lamports} value.
+ *
+ * @see {@link getDefaultLamportsDecoder}
+ * @see {@link getDefaultLamportsEncoder}
+ */
+export declare function getDefaultLamportsCodec(): FixedSizeCodec<Lamports, Lamports, 8>;
+/**
+ * Returns a codec that you can use to encode from or decode to {@link Lamports} value.
+ *
+ * @see {@link getLamportsDecoder}
+ * @see {@link getLamportsEncoder}
+ */
+export declare function getLamportsCodec<TCodec extends NumberCodec>(innerCodec: TCodec): Codec<Lamports, Lamports> & ExtractAdditionalProps<TCodec, NumberCodec>;
+export {};
+//# sourceMappingURL=lamports.d.ts.map

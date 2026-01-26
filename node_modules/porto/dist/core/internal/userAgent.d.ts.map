@@ -1,0 +1,1 @@
+{"version":3,"file":"userAgent.d.ts","sourceRoot":"","sources":["../../../src/core/internal/userAgent.ts"],"names":[],"mappings":"AAAA,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,SAAS;QACjB,aAAa,CAAC,EAAE;YACd,MAAM,CAAC,EAAE,OAAO,CAAA;SACjB,CAAA;KACF;CACF;AAED,wBAAgB,QAAQ,YAGvB;AAED,wBAAgB,SAAS,YAMxB;AAED,wBAAgB,QAAQ,YAavB"}
