@@ -149,6 +149,8 @@ async function handleMethod(method: string, params: any) {
       return handleTasksGet(params);
     case 'tasks/cancel':
       return handleTasksCancel(params);
+    case 'health/check':
+      return handleHealthCheck();
     default:
       throw new Error(`Method not found: ${method}`);
   }
@@ -230,6 +232,25 @@ async function handleTasksCancel(params: { taskId: string }) {
   }
   task.status = 'canceled';
   return task;
+}
+
+/**
+ * Handle health/check - return basic runtime and config status
+ */
+async function handleHealthCheck() {
+  return {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    payment: {
+      enabled: ENABLE_X402,
+      payee: PAYEE_ADDRESS,
+      network: 'base-sepolia',
+      price: process.env.X402_PRICE || '$0.001',
+    },
+    agent: {
+      model: 'gpt-4o-mini',
+    },
+  };
 }
 
 // ============================================================================

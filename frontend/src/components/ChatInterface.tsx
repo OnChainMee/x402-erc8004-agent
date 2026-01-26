@@ -19,6 +19,7 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contextId, setContextId] = useState<string | undefined>();
+  const [lastUserMessage, setLastUserMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -42,6 +43,7 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
     setInput('');
     setLoading(true);
     setError(null);
+    setLastUserMessage(input);
 
     try {
       // Note: In production, you'll need to handle x402 payment headers here
@@ -75,6 +77,12 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = async () => {
+    if (!lastUserMessage || loading) return;
+    setInput(lastUserMessage);
+    await handleSend();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -141,8 +149,15 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
       {/* Input */}
       <div className="p-4 border-t">
         {error && (
-          <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-            {error}
+          <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm flex items-center justify-between gap-2">
+            <span>{error}</span>
+            <button
+              onClick={handleRetry}
+              className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+              disabled={loading || !lastUserMessage}
+            >
+              Retry
+            </button>
           </div>
         )}
         <div className="flex space-x-2">
