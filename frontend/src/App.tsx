@@ -68,15 +68,28 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-            x402 & ERC-8004 Agent
-          </h1>
-          <p className="text-white/80 text-lg">
-            Decentralized AI Agent with Payment & Identity
-          </p>
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-6">
+        <header className="mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-slate-500">Agent Console</p>
+              <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">
+                x402 & ERC-8004 Agent
+              </h1>
+              <p className="text-slate-500 mt-1">
+                Secure A2A messaging with payments and on-chain identity
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+                Live
+              </span>
+              <span className="inline-flex items-center rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200">
+                Base Sepolia
+              </span>
+            </div>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -2,124 +2,92 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A complete AI agent application that integrates both **x402** (Coinbase payment protocol) and **ERC-8004** (Agent Identity Registry) standards.
+Production-ready agent application that combines:
+- **A2A (JSON-RPC 2.0)** for agent-to-agent messaging
+- **x402** for automated micropayments
+- **ERC-8004** for on-chain agent identity
 
-## Features
+## Highlights
 
-- 🤖 **A2A Protocol Server**: JSON-RPC 2.0 endpoint for agent-to-agent communication
-- 💰 **x402 Payment Integration**: Automated micropayments via Coinbase's x402 protocol
-- 🆔 **ERC-8004 Identity**: On-chain agent identity registration and management
-- 🧠 **AI Agent**: Powered by OpenAI GPT-4o-mini for intelligent responses
-- 🎨 **Modern Frontend**: Beautiful React UI for interacting with the agent
+- A2A server with `/a2a` JSON-RPC endpoint and discovery card
+- x402 payment middleware with configurable pricing and network
+- ERC-8004 registration flow with IPFS metadata via Pinata
+- OpenAI-powered agent responses
+- React UI for agent info, payment status, and chat
 
 ## Architecture
 
-### x402 Payment Protocol
+### x402 Payment
 - Integrated via `x402-express` middleware
-- Protects the `/a2a` endpoint with payment verification
-- Configured for Base Sepolia testnet (can be changed to mainnet)
-- Default price: $0.001 per request
+- Secures `/a2a` with payment verification
+- Default: Base Sepolia testnet, `$0.001` per request
 
-### ERC-8004 Identity Registry
-- Agent registration on Base Sepolia Identity Registry
-- IPFS metadata storage via Pinata
-- On-chain NFT-based agent identity
-- Supports reputation and trust mechanisms
+### ERC-8004 Identity
+- Registration on Base Sepolia Identity Registry
+- IPFS metadata using Pinata
+- NFT-based agent identity with trust primitives
 
-## Setup
+## Quickstart
 
-### 1. Install Dependencies
-
+### 1. Install dependencies
 ```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
-
-Copy `.env.example` to `.env` and fill in your values:
-
+### 2. Configure environment
 ```bash
 cp .env.example .env
 ```
 
-Required environment variables:
-- `OPENAI_API_KEY`: Your OpenAI API key
-- `X402_PAYEE_ADDRESS`: Your wallet address to receive payments (default provided)
-- `PRIVATE_KEY`: Wallet private key for ERC-8004 registration (needs testnet ETH)
-- `PINATA_JWT`: Pinata JWT token for IPFS uploads
+Required:
+- `OPENAI_API_KEY`
+- `X402_PAYEE_ADDRESS`
+- `PRIVATE_KEY` (for ERC-8004 registration)
+- `PINATA_JWT`
 
-Optional environment variables:
-- `DISABLE_X402`: Set to `true` to disable x402 payment middleware for development/testing
-- `X402_PRICE`: Price per request (default: `$0.001`)
-- `PORT`: Server port (default: `3000`)
+Optional:
+- `DISABLE_X402=true` (development)
+- `X402_PRICE` (default `$0.001`)
+- `PORT` (default `3000`)
 
-### 3. Register Your Agent (ERC-8004)
-
-Register your agent on the ERC-8004 Identity Registry:
-
+### 3. (Optional) Register your agent
 ```bash
 npm run register
 ```
+This uploads `registration.json` to IPFS, registers on ERC-8004, and updates the file with `agentId`. You'll need Base Sepolia ETH for gas.
 
-This will:
-1. Upload your `registration.json` metadata to IPFS
-2. Call the Identity Registry contract to mint your agent NFT
-3. Return your `agentId` for future reference
-
-**Note**: You'll need testnet ETH on Base Sepolia for gas fees.
-
-### 4. Verify Setup (Optional)
-
-Verify that everything is configured correctly:
-
+### 4. (Optional) Verify setup
 ```bash
 npm run verify
 ```
+Checks environment variables, required files, dependencies, and ERC-8004 registration status.
 
-This will check:
-- Environment variables are set
-- Required files exist
-- Dependencies are installed
-- ERC-8004 registration status
-
-### 5. Start the A2A Server
-
+### 5. Start the server
 ```bash
 npm run start:a2a
 ```
+Endpoints:
+- Agent card: `http://localhost:3000/.well-known/agent-card.json`
+- JSON-RPC: `http://localhost:3000/a2a`
 
-The server will start on `http://localhost:3000` with:
-- Agent Card: `http://localhost:3000/.well-known/agent-card.json`
-- JSON-RPC endpoint: `http://localhost:3000/a2a`
-
-### 6. Start the Frontend (Optional)
-
-To use the web UI:
-
+### 6. Start the frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+Frontend: `http://localhost:5173`
 
-The frontend will be available at `http://localhost:5173`
-
-See [frontend/README.md](frontend/README.md) for detailed frontend setup instructions.
+See `frontend/README.md` for detailed frontend setup.
 
 ## Usage
 
-### Agent Card Discovery
-
-Other agents can discover your agent via:
-
+### Discover the agent card
 ```bash
 curl http://localhost:3000/.well-known/agent-card.json
 ```
 
-### Sending Messages (A2A Protocol)
-
-Send a message to your agent using JSON-RPC 2.0:
-
+### Send a message (A2A JSON-RPC)
 ```bash
 curl -X POST http://localhost:3000/a2a \
   -H "Content-Type: application/json" \
@@ -135,33 +103,30 @@ curl -X POST http://localhost:3000/a2a \
     "id": 1
   }'
 ```
+Note: when x402 is enabled, `/a2a` requires valid payment headers.
 
-**Note**: The `/a2a` endpoint is protected by x402 payment middleware. Requests must include valid x402 payment headers.
-
-### Supported Methods
-
-- `message/send`: Send a message and get a response
-- `tasks/get`: Get status of a previous task
-- `tasks/cancel`: Cancel a running task
+### Supported methods
+- `message/send`
+- `tasks/get`
+- `tasks/cancel`
 
 ## Project Structure
-
 ```
 .
 ├── src/
-│   ├── a2a-server.ts      # A2A protocol server with x402 middleware
-│   ├── agent.ts            # LLM agent logic (OpenAI integration)
+│   ├── a2a-server.ts       # A2A server with x402 middleware
+│   ├── agent.ts            # LLM agent logic
 │   ├── register.ts         # ERC-8004 registration script
-│   └── verify-setup.ts     # Setup verification script
-├── frontend/               # React frontend application
+│   └── verify-setup.ts     # Setup verification
+├── frontend/               # React UI
 │   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── services/       # API clients and services
-│   │   └── App.tsx         # Main app component
+│   │   ├── components/     # UI components
+│   │   ├── services/       # API clients
+│   │   └── App.tsx         # Main app
 │   └── package.json
 ├── .well-known/
 │   └── agent-card.json     # Agent discovery card
-├── registration.json       # ERC-8004 registration metadata
+├── registration.json       # ERC-8004 metadata
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -169,54 +134,39 @@ curl -X POST http://localhost:3000/a2a \
 
 ## Configuration
 
-### x402 Payment Settings
-
-Edit `src/a2a-server.ts` to change:
-- Payment price: `process.env.X402_PRICE || '$0.001'`
-- Network: `'base-sepolia'` (change to `'base'` for mainnet)
+### x402 settings
+Update `src/a2a-server.ts` to change:
+- Price: `process.env.X402_PRICE || '$0.001'`
+- Network: `'base-sepolia'` or `'base'`
 - Facilitator URL: `'https://x402.org/facilitator'`
 
-**Development Mode**: To disable x402 payment middleware for testing, set `DISABLE_X402=true` in your `.env` file or run:
+Disable payments for dev:
 ```bash
 DISABLE_X402=true npm run start:a2a
 ```
 
-This allows you to test the agent without payment requirements.
+### ERC-8004 registry
+Update `src/register.ts`:
+- Chain: Base Sepolia (chain ID `84532`)
+- Registry: `0x8004AA63c570c570eBF15376c0dB199918BFe9Fb`
 
-### ERC-8004 Registry
-
-Edit `src/register.ts` to change:
-- Chain: Currently Base Sepolia (chain ID: 84532)
-- Registry address: `0x8004AA63c570c570eBF15376c0dB199918BFe9Fb`
-
-### Agent Behavior
-
-Edit `src/agent.ts` to customize:
-- LLM model: Currently `'gpt-4o-mini'`
-- System prompt: Agent personality and behavior
-- Response generation logic
+### Agent behavior
+Update `src/agent.ts`:
+- Model: `gpt-4o-mini`
+- System prompt
+- Response logic
 
 ## Development
-
-### Build TypeScript
-
 ```bash
 npm run build
 ```
 
-### Environment
-
-- **Testnet**: Base Sepolia (default)
-- **Mainnet**: Base (change network configs)
-
 ## Resources
-
 - [A2A Protocol](https://a2a-protocol.org/)
 - [x402 Documentation](https://docs.cdp.coinbase.com/x402/quickstart-for-sellers)
 - [ERC-8004 Standard](https://eips.ethereum.org/EIPS/eip-8004)
 - [Base Sepolia Explorer](https://sepolia.basescan.org/)
 
 ## License
-
 MIT
 

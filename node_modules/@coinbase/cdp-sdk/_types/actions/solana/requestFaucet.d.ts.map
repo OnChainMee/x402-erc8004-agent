@@ -1,1 +1,0 @@
-{"version":3,"file":"requestFaucet.d.ts","sourceRoot":"","sources":["../../../actions/solana/requestFaucet.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,oBAAoB,EAAE,eAAe,EAAE,MAAM,qCAAqC,CAAC;AAC5F,OAAO,EAAE,oBAAoB,EAAE,MAAM,+BAA+B,CAAC;AAErE;;;;;;;;;;;;;;;;;;GAkBG;AACH,wBAAsB,aAAa,CACjC,SAAS,EAAE,oBAAoB,EAC/B,OAAO,EAAE,oBAAoB,GAC5B,OAAO,CAAC,eAAe,CAAC,CAS1B"}

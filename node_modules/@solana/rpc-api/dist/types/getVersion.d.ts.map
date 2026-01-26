@@ -1,1 +1,0 @@
-{"version":3,"file":"getVersion.d.ts","sourceRoot":"","sources":["../../src/getVersion.ts"],"names":[],"mappings":"AAAA,KAAK,qBAAqB,GAAG,QAAQ,CAAC;IAClC;;;;;;OAMG;IACH,aAAa,EAAE,MAAM,CAAC;IACtB,mCAAmC;IACnC,aAAa,EAAE,MAAM,CAAC;CACzB,CAAC,CAAC;AAEH,MAAM,MAAM,aAAa,GAAG;IACxB;;;;OAIG;IACH,UAAU,IAAI,qBAAqB,CAAC;CACvC,CAAC"}

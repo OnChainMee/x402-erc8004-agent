@@ -1,1 +1,0 @@
-{"version":3,"file":"chainToNetworkMapper.d.ts","sourceRoot":"","sources":["../../../accounts/evm/chainToNetworkMapper.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,YAAY,CAAC;AACnD,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,MAAM,CAAC;AAElC;;;;;;GAMG;AACH,wBAAgB,iBAAiB,CAAC,KAAK,EAAE,KAAK,GAAG,gBAAgB,GAAG,SAAS,CA0B5E"}

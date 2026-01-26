@@ -93,20 +93,27 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg flex flex-col h-[600px]">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[620px]">
       {/* Header */}
-      <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
-        <h2 className="text-xl font-bold">Chat with Agent</h2>
-        <p className="text-sm text-white/80">
-          {agentCard?.endpoints.a2a.protocol || 'JSON-RPC 2.0'}
-        </p>
+      <div className="p-4 border-b border-slate-200 bg-slate-50 rounded-t-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Conversation</h2>
+            <p className="text-xs text-slate-500">
+              {agentCard?.endpoints.a2a.protocol || 'JSON-RPC 2.0'}
+            </p>
+          </div>
+          <span className="text-xs text-slate-600 bg-white border border-slate-200 rounded-full px-2 py-1">
+            Secure Channel
+          </span>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-white">
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 mt-8">
-            <p className="text-lg mb-2">👋 Start a conversation</p>
+          <div className="text-center text-slate-500 mt-8">
+            <p className="text-base font-medium mb-1">Start a conversation</p>
             <p className="text-sm">Send a message to interact with the agent</p>
           </div>
         )}
@@ -119,8 +126,8 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
             <div
               className={`max-w-[80%] rounded-lg p-3 ${
                 msg.role === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-800'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-slate-100 text-slate-800'
               }`}
             >
               <p className="whitespace-pre-wrap">{msg.text}</p>
@@ -133,11 +140,11 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg p-3">
+            <div className="bg-slate-100 rounded-lg p-3">
               <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
               </div>
             </div>
           </div>
@@ -147,9 +154,9 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t">
+      <div className="p-4 border-t border-slate-200 bg-slate-50 rounded-b-xl">
         {error && (
-          <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm flex items-center justify-between gap-2">
+          <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs flex items-center justify-between gap-2">
             <span>{error}</span>
             <button
               onClick={handleRetry}
@@ -166,20 +173,20 @@ export default function ChatInterface({ agentCard }: ChatInterfaceProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your message..."
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="flex-1 p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/20 resize-none bg-white"
             rows={2}
             disabled={loading}
           />
           <button
             onClick={handleSend}
             disabled={loading || !input.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-5 py-3 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             Send
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2">
-          💡 Note: x402 payment required for API calls in production
+        <p className="text-xs text-slate-500 mt-2">
+          Note: x402 payment required for API calls in production
         </p>
       </div>
     </div>

@@ -1,1 +1,0 @@
-{"version":3,"file":"signMessage.d.ts","sourceRoot":"","sources":["../../../actions/solana/signMessage.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,eAAe,EAAE,MAAM,qCAAqC,CAAC;AAC1F,OAAO,EAAE,oBAAoB,EAAE,MAAM,+BAA+B,CAAC;AAErE;;;;;;;;;;;;;;;;;;GAkBG;AACH,wBAAsB,WAAW,CAC/B,SAAS,EAAE,oBAAoB,EAC/B,OAAO,EAAE,kBAAkB,GAC1B,OAAO,CAAC,eAAe,CAAC,CAU1B"}

@@ -18,7 +18,7 @@
 
 import 'dotenv/config';
 import fs from 'fs/promises';
-import { createWalletClient, createPublicClient, http, parseAbi } from 'viem';
+import { createWalletClient, createPublicClient, decodeEventLog, http, parseAbi } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 
 // ============================================================================
@@ -142,7 +142,7 @@ async function main() {
   for (const log of receipt.logs) {
     if (log.address.toLowerCase() === IDENTITY_REGISTRY.toLowerCase()) {
       try {
-        const decoded = publicClient.decodeEventLog({
+        const decoded = decodeEventLog({
           abi: IDENTITY_REGISTRY_ABI,
           data: log.data,
           topics: log.topics,

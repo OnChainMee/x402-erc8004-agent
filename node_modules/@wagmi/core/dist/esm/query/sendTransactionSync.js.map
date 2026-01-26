@@ -1,1 +1,0 @@
-{"version":3,"file":"sendTransactionSync.js","sourceRoot":"","sources":["../../../src/query/sendTransactionSync.ts"],"names":[],"mappings":"AAEA,OAAO,EAIL,mBAAmB,GACpB,MAAM,mCAAmC,CAAA;AAI1C,MAAM,UAAU,kCAAkC,CAChD,MAAc;IAEd,OAAO;QACL,UAAU,CAAC,SAAS;YAClB,OAAO,mBAAmB,CAAC,MAAM,EAAE,SAAS,CAAC,CAAA;QAC/C,CAAC;QACD,WAAW,EAAE,CAAC,qBAAqB,CAAC;KAKrC,CAAA;AACH,CAAC"}

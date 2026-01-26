@@ -1,1 +1,0 @@
-{"version":3,"file":"serializeTransaction.js","sourceRoot":"","sources":["../../utils/serializeTransaction.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,oBAAoB,EAAE,MAAM,MAAM,CAAC;AAI5C;;;;;GAKG;AACH,MAAM,UAAU,2BAA2B,CAAC,WAAsC;IAChF,OAAO,oBAAoB,CAAC;QAC1B,GAAG,WAAW;QACd,OAAO,EAAE,CAAC,EAAE,0BAA0B;QACtC,IAAI,EAAE,SAAS;KAChB,CAAC,CAAC;AACL,CAAC"}
