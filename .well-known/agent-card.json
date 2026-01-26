@@ -1,0 +1,25 @@
+{
+  "name": "pd",
+  "description": "AI agent with x402 payment and ERC-8004 identity",
+  "version": "0.3.0",
+  "capabilities": [
+    "message/send",
+    "tasks/get",
+    "tasks/cancel"
+  ],
+  "endpoints": {
+    "a2a": {
+      "url": "http://localhost:3000/a2a",
+      "protocol": "json-rpc-2.0"
+    }
+  },
+  "payment": {
+    "protocol": "x402",
+    "network": "base-sepolia",
+    "payee": "0x50E4D6684a8185b875117cBebB90C72edE1b2819"
+  },
+  "identity": {
+    "standard": "ERC-8004",
+    "registry": "eip155:84532:0x8004AA63c570c570eBF15376c0dB199918BFe9Fb"
+  }
+}

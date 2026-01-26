@@ -1,0 +1,44 @@
+{
+  "name": "x402-erc8004-agent",
+  "version": "1.0.0",
+  "description": "AI Agent with x402 Payment Protocol and ERC-8004 Identity Registry",
+  "type": "module",
+  "keywords": [
+    "x402",
+    "erc-8004",
+    "a2a",
+    "ai-agent",
+    "blockchain",
+    "ethereum",
+    "base"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "build": "tsc",
+    "register": "tsx src/register.ts",
+    "start:a2a": "tsx src/a2a-server.ts",
+    "verify": "tsx src/verify-setup.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "openai": "^4.68.0",
+    "uuid": "^9.0.0",
+    "viem": "^2.21.0",
+    "x402-express": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0"
+  }
+}

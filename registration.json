@@ -1,0 +1,23 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "pd",
+  "description": "agent",
+  "image": "https://example.com/agent.png",
+  "endpoints": [
+    {
+      "name": "A2A",
+      "endpoint": "https://pd.example.com/.well-known/agent-card.json",
+      "version": "0.3.0"
+    },
+    {
+      "name": "agentWallet",
+      "endpoint": "eip155:84532:0x50E4D6684a8185b875117cBebB90C72edE1b2819"
+    }
+  ],
+  "registrations": [],
+  "supportedTrust": [
+    "reputation",
+    "crypto-economic",
+    "tee-attestation"
+  ]
+}
